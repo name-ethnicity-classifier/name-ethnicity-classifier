@@ -13,7 +13,7 @@
 
 ## 👨‍💻 usage:
 
- - ## :grey_exclamation: read this first:
+ - ## read this first:
 
     Before you start classifying, check out the different model configurations inside the folder [model_configurations/](./model_configurations/) or in the table below.
 
@@ -25,9 +25,9 @@
 
     ---
 
- - ## :round_pushpin: classifying names in a given .csv file :
+ - ## classifying names in a given .csv file :
 
-    ### :heavy_dollar_sign: example command:
+    ### example command:
     ```
     python predict_ethnicity.py -i .\examples\names.csv -o .\examples\predicted_ethnicities.csv -m 21_nationalities_and_else -d gpu -b 64
     ```
@@ -41,7 +41,7 @@
     | ```-d, --device``` | device on which the model will run, must be either "gpu" or "cpu" | optional, default: gpu if CUDA detected |
     | ```-b, --batchsize``` | specifies how many names will be processed in parallel (if it crashes choose a batch-size smaller than the amount of names in your .csv file) | optional, default: amount of names in input-file |
 
-    ### :page_facing_up: example files:
+    ### example files:
     "names.csv" has to have one column named "names" (upper-/ lower case doesn't matter):
     ```csv
     1 names,
@@ -58,16 +58,16 @@
 
     ---
 
- - ## :round_pushpin: predicting a single name:
+ - ## predicting a single name:
 
-    ### :heavy_dollar_sign: example command:
+    ### example command:
     ```
     python3 predict_ethnicitiy.py -n "Gonzalo Rodriguez"
 
     >> name: Gonzalo Rodriguez - predicted ethnicity: spanish
     ```
 
-    ### :black_flag: flags:
+    ### flags:
     | flag | description | option |
     | :-------------: |:------------- | ----- |
     | ```-n, --name``` | first and last name (upper-/ lower case doesn't matter) | optional, alternative: -i | 
