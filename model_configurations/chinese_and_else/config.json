@@ -1,0 +1,6 @@
+{
+    "embedding-size": 200,
+    "hidden-size": 200,
+    "rnn-layers": 2,
+    "cnn-parameters": [3, [256]]
+}

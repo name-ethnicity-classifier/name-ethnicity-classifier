@@ -1,0 +1,26 @@
+{
+    "model-name": "8_groups",
+    "dataset-name": "8_groups",
+    "test-size": 0.1,
+    "optimizer": "Adam",
+    "loss-function": "NLLLoss",
+    "epochs": 5,
+    "batch-size": 512,
+    "cnn-parameters": [
+        3,
+        [
+            256
+        ]
+    ],
+    "hidden-size": 256,
+    "rnn-layers": 2,
+    "lr-schedule": [
+        0.0002,
+        0.975,
+        300
+    ],
+    "dropout-chance": 0.35,
+    "embedding-size": 200,
+    "augmentation": 0.0,
+    "resume": true
+}

@@ -1,0 +1,26 @@
+{
+    "british": 0,
+    "else": 1,
+    "indian": 2,
+    "hungarian": 3,
+    "spanish": 4,
+    "german": 5,
+    "zimbabwean": 6,
+    "polish": 7,
+    "bulgarian": 8,
+    "turkish": 9,
+    "pakistani": 10,
+    "italian": 11,
+    "romanian": 12,
+    "french": 13,
+    "chinese": 14,
+    "swedish": 15,
+    "nigerian": 16,
+    "greek": 17,
+    "japanese": 18,
+    "dutch": 19,
+    "ukrainian": 20,
+    "danish": 21,
+    "russian": 22
+}
+

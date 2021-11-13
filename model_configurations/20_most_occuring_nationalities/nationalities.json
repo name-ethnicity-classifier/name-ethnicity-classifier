@@ -1,0 +1,22 @@
+{
+    "british": 0,
+    "norwegian": 1,
+    "indian": 2,
+    "irish": 3,
+    "spanish": 4,
+    "american": 5,
+    "german": 6,
+    "polish": 7,
+    "bulgarian": 8,
+    "turkish": 9,
+    "pakistani": 10,
+    "italian": 11,
+    "romanian": 12,
+    "french": 13,
+    "australian": 14,
+    "chinese": 15,
+    "swedish": 16,
+    "nigerian": 17,
+    "dutch": 18,
+    "filipino": 19
+}
