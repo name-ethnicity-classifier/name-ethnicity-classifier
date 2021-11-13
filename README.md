@@ -32,7 +32,7 @@
     python predict_ethnicity.py -i .\examples\names.csv -o .\examples\predicted_ethnicities.csv -m 21_nationalities_and_else -d gpu -b 64
     ```
 
-    ### :black_flag: flags:
+    ### flags:
     | flag | description | option |
     | :------------- |:------------- | ----- |
     | ```-i, --input``` | path to .csv containing (first and last) names; must contain one column called "names" (file-name freely selectable) | optional, alternative: -n | 
