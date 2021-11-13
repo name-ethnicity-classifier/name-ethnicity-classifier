@@ -5,7 +5,7 @@
 - repository installation:
     ```
     git clone https://github.com/hollowcodes/name-ethnicity-classification.git
-    cd name-ethnicity-classification/
+    cd name-ethnicity-classifier/
     ```
 - dependencies: Python>=3.7, PyTorch, NumPy, Pandas
 
@@ -13,35 +13,35 @@
 
 ## 👨‍💻 usage:
 
- - ## read this first:
+ - ## :grey_exclamation: read this first:
 
     Before you start classifying, check out the different model configurations inside the folder [model_configurations/](./model_configurations/) or in the table below.
 
     There you will find different models which each classify a unique set of nationalities.
 
-    The [README.md]("./../README.md") in each model folder will inform you about which ethnicities it can classify, its performance and more information you should know about it.
+    The README.md in each model folder will inform you about which ethnicities it can classify, its performance and more information you should know about it.
 
-    When using the console interface, you can specify which model you want to use.
+    When using this console interface, you can specify which model you want to use.
 
     ---
 
- - ## classifying names in a given .csv file :
+ - ## :round_pushpin: classifying names in a given .csv file :
 
-    ### example command:
+    ### :heavy_dollar_sign: example command:
     ```
     python predict_ethnicity.py -i .\examples\names.csv -o .\examples\predicted_ethnicities.csv -m 21_nationalities_and_else -d gpu -b 64
     ```
 
-    ### flags:
+    ### :black_flag: flags:
     | flag | description | option |
-    | :-------------: |:------------- | ----- |
+    | :------------- |:------------- | ----- |
     | ```-i, --input``` | path to .csv containing (first and last) names; must contain one column called "names" (file-name freely selectable) | optional, alternative: -n | 
     | ```-o, --output``` | path to .csv in which the names along with the predictions will be stored (file will be created if it doesn't exist; file-name freely selectable) | required after -i |
     | ```-m, --model``` | name of model configuration which can be chosen from "model_configurations/" or from the table below | optional, default: 21_nationalities_and_else |
     | ```-d, --device``` | device on which the model will run, must be either "gpu" or "cpu" | optional, default: gpu if CUDA detected |
     | ```-b, --batchsize``` | specifies how many names will be processed in parallel (if it crashes choose a batch-size smaller than the amount of names in your .csv file) | optional, default: amount of names in input-file |
 
-    ### example files:
+    ### :page_facing_up: example files:
     "names.csv" has to have one column named "names" (upper-/ lower case doesn't matter):
     ```csv
     1 names,
@@ -58,16 +58,16 @@
 
     ---
 
- - ## predicting a single name:
+ - ## :round_pushpin: predicting a single name:
 
-    ### example command:
+    ### :heavy_dollar_sign: example command:
     ```
     python3 predict_ethnicitiy.py -n "Gonzalo Rodriguez"
 
     >> name: Gonzalo Rodriguez - predicted ethnicity: spanish
     ```
 
-    ### flags:
+    ### :black_flag: flags:
     | flag | description | option |
     | :-------------: |:------------- | ----- |
     | ```-n, --name``` | first and last name (upper-/ lower case doesn't matter) | optional, alternative: -i | 
