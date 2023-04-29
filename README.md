@@ -30,6 +30,9 @@ The README.md in each model folder will inform you about which ethnicities it ca
 
 When using this console interface, you can specify which model you want to use.
 
+##### None of the models is suitable for your problem?
+On our website, www.name-to-ethnicity.com, you can request custom models trained on selected ethnicities (for free!).
+
 ---
 
 ### Option 1: classifying names in a given .csv file :
