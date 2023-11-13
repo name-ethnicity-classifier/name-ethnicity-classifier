@@ -1,6 +1,6 @@
 # name ethnicity classification
 
-This repository is part of the [name-to-ethnicity](www.name-to-ethnicity.com) research project. If you use this classifier for your scientific work, please cite our [paper](https://link.springer.com/article/10.1007/s00146-022-01619-4#citeas).
+This repository is part of the [name-to-ethnicity](https://www.name-to-ethnicity.com) research project. If you use this classifier for your scientific work, please cite our [paper](https://link.springer.com/article/10.1007/s00146-022-01619-4#citeas).
 
 
 ## What is name-ethnicity classification?
