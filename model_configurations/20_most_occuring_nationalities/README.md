@@ -1,5 +1,5 @@
 
-# this model classifies the 20 nationalities that occur in our dataset the most 
+# This model classifies the 20 nationalities that occur in our dataset the most 
 
 ## | inputs:
  - must contain first and last name and can contain one or multiple middle names

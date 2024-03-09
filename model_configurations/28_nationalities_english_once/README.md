@@ -1,5 +1,5 @@
 
-# this model classifies 28 nationalities of which only one is english speaking
+# This model classifies 28 nationalities of which only one is english speaking
 
 ## | inputs:
  - must contain first and last name and can contain one or multiple middle names

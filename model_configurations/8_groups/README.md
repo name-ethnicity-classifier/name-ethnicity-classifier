@@ -1,5 +1,5 @@
 
-# this model classifies 8 major groups of nationalities
+# This model classifies 8 major groups of nationalities
 
 ## | inputs:
  - must contain first and last name and can contain one or multiple middle names
