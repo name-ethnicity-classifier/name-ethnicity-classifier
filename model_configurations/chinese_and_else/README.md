@@ -1,5 +1,5 @@
 
-# this model classifies between chinese names and non-chinese names
+# This model classifies between chinese names and non-chinese names
 
 ## | inputs:
  - must contain first and last name and can contain one or multiple middle names

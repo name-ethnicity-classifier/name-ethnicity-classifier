@@ -1,5 +1,5 @@
 
-# this model classifies 21 nationalities and the "else" category
+# This model classifies 21 nationalities and the "else" category
 
 ## | inputs:
  - must contain first and last name and can contain one or multiple middle names

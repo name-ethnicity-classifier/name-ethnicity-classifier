@@ -1,5 +1,5 @@
 
-# this model classifies german/austrian names from other nationalities
+# This model classifies german/austrian names from other nationalities
 
 
 ## | nationalities the model can classify:
