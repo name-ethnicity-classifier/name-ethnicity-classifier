@@ -95,6 +95,7 @@ python3 predict_ethnicitiy.py -n "Gonzalo Rodriguez"
 | ```chinese_and_else``` | <details><summary>click to see nationalities</summary>``chinese`` ``else``</details> | 98.55% |
 | ```20_most_occuring_nationalities``` | <details><summary>click to see nationalities</summary>``british`` ``norwegian`` ``indian`` ``irish`` ``spanish`` ``american`` ``german`` ``polish`` ``bulgarian`` ``turkish`` ``pakistani`` ``italian`` ``romanian`` ``french`` ``australian`` ``chinese`` ``swedish`` ``nigerian`` ``dutch`` ``filipin``</details> | 75.36% |
 | ```german_austrian_and_else``` | <details><summary>click to see nationalities</summary>``german/austrian combined`` ``else``</details> | 88.1% |
+| ```indian_and_else``` | <details><summary>click to see nationalities</summary>``indian`` ``else``</details> | 94.63% |
 
 
 
