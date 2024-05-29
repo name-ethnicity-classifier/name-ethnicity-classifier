@@ -2,6 +2,7 @@ import torch
 import torch.utils.data
 import torch.nn as nn
 from torch.nn.utils.rnn import pad_sequence
+import numpy as np
 import argparse
 import json
 import pandas as  pd
@@ -48,9 +49,12 @@ class Model(nn.Module):
         return x
 
 
-def get_flags() -> Union[list, str, str, int, str]:
-    """ handles console arguments
+def get_flags() -> Union[list, bool, str, str, int, str]:
+    """
+    Handles console arguments
 
+    :return list: list of names to predict ethnicities
+    :return bool: wether the user wants the entire output distribution
     :return list: list of names to predict ethnicities
     :return str: path of csv-file in which to save ethnicities
     :return str: model configuration name
@@ -60,15 +64,13 @@ def get_flags() -> Union[list, str, str, int, str]:
 
     parser = argparse.ArgumentParser()
 
-    csv_names_group = parser.add_argument_group("classify multiple names")
-    single_name_group = parser.add_argument_group("classify single name")
-
-    csv_names_group.add_argument("-i", "--input", required=False, help="path to .csv containing (first and last) names; must contain one column called 'names' (name freely selectable)")
-    csv_names_group.add_argument("-o", "--output", required=False, help="path to .csv in which the names along with the predictions will be stores (file will be created if it doesn't exist; name freely selectable)")
-    csv_names_group.add_argument("-d", "--device", required=False, help="must be either 'gpu' or 'cpu' (standard: 'gpu' if cuda support is detected, else 'cpu')")
-    csv_names_group.add_argument("-b", "--batchsize", required=False, help="specifies how many names will be processed in parallel (standard: process all names in parallel; if it crashes choose a batch-size smaller than the amount of names in your .csv file; the bigger the batchsize the faster it will classify the names)")
-    single_name_group.add_argument("-n", "--name", required=False, help="first and last name (upper-/ lower case doesn't matter)")
-    parser.add_argument("-m", "--model", required=False, help="folder name of model configuration which can be chosen from 'model_configurations/' (standard: '21_nationalities_and_else')")
+    parser.add_argument("-i", "--input", required=False, help="Path to .csv containing (first and last) names; must contain one column called 'names' (name freely selectable)")
+    parser.add_argument("-o", "--output", required=False, help="Path to .csv in which the names along with the predictions will be stores (file will be created if it doesn't exist; name freely selectable)")
+    parser.add_argument("-d", "--device", required=False, help="Must be either 'gpu' or 'cpu' (standard: 'gpu' if cuda support is detected, else 'cpu')")
+    parser.add_argument("-b", "--batchsize", required=False, help="Specifies how many names will be processed in parallel (standard: process all names in parallel; if it crashes choose a batch-size smaller than the amount of names in your .csv file; the bigger the batchsize the faster it will classify the names)")
+    parser.add_argument("-n", "--name", required=False, help="First and last name (upper-/ lower case doesn't matter)")
+    parser.add_argument("-m", "--model", required=False, help="Folder name of model configuration which can be chosen from 'model_configurations/' (standard: '21_nationalities_and_else')")
+    parser.add_argument("--distribution", required=False, action="store_true", help="If set, the entire output distribution is returned")
 
     args = vars(parser.parse_args())
 
@@ -76,6 +78,7 @@ def get_flags() -> Union[list, str, str, int, str]:
     if args["name"] != None and args["input"] == None:
         names = [args["name"]]
         csv_out_path = None
+        get_distribution = False
     
     # check if -/--name is not used but -i/--input is
     elif args["name"] == None and args["input"] != None:
@@ -91,8 +94,12 @@ def get_flags() -> Union[list, str, str, int, str]:
     elif args["name"] != None and args["input"] != None:
         raise ValueError("-n/--name and -i/--input can't both be set!")
 
-    if args["input"] != None and args["output"] == None or args["input"] == None and args["output"] != None:
-        raise ValueError("When using -i/--input the -o/--output flag is required (and the other way around)!")
+    # create an output file name if none was specified
+    if args["input"] != None and args["output"] == None:
+        csv_out_path = f"{args['input'].removesuffix('.csv')}_output.csv"
+
+    # check wether the user wants the entire output distribution
+    get_distribution = args["distribution"]
 
     # get model
     if args["model"] == None:
@@ -120,11 +127,12 @@ def get_flags() -> Union[list, str, str, int, str]:
     else:
         raise NameError("Please use either 'GPU' or 'CPU' as device type!")
 
-    return names, csv_out_path, model_config_folder, batch_size, device
+    return names, get_distribution, csv_out_path, model_config_folder, batch_size, device
 
 
 def replace_special_chars(name: str) -> str:
-    """ replaces all apostrophe letters with their base letters and removes all other special characters incl. numbers
+    """
+    Replaces all apostrophe letters with their base letters and removes all other special characters incl. numbers
     
     :param str name: name
     :return str: normalized name
@@ -138,7 +146,8 @@ def replace_special_chars(name: str) -> str:
 
 
 def preprocess_names(names: list=[str], batch_size: int=128) -> torch.tensor:
-    """ create a pytorch-usable input-batch from a list of string-names
+    """
+    Creates a pytorch compatible input-batch from a list of string-names
     
     :param list names: list of names (strings)
     :param int batch_size: batch-size for the forward pass
@@ -174,10 +183,56 @@ def preprocess_names(names: list=[str], batch_size: int=128) -> torch.tensor:
         padded_batch = torch.split(padded_batch, batch_size)
 
     return padded_batch
+
+
+def get_ethnicity_predictions(predictions: np.array, classes: list) -> list[str]:
+    """
+    Collects the highest confidence ethnicity for every prediction in a batch.
+    For example if the model classified a batch of two names into eithher "german" or "greek":
+    > [(german, 0.9), (greek, 0.8)]
+
+    :param predictions: The output predictions of the model
+    :param classes: A list containing all the classes which a model can classify
+    :return: A list containing the predicted ethnicity and confidence score for each name
+    """
+
+    predicted_ethnicites = []
+    for prediction in predictions:
+        prediction_idx = list(prediction).index(max(prediction))
+        ethnicity = classes[prediction_idx]
+        predicted_ethnicites.append((ethnicity, round(100 * float(np.exp(max(prediction))), 3)))
+
+    return predicted_ethnicites
+
+
+def get_ethnicity_distributions(predictions: np.array, classes: list) -> list[dict]:
+    """
+    Collects the entire output distribution for every predictions in a batch
+    For example if the model classified a batch of two names into eithher "german" or "greek":
+    > [{german: 0.9, greek: 0.1}, {german: 0.2, greek: 0.8}]
+
+    :param predictions: The output predictions of the model
+    :param classes: A list containing all the classes which a model can classify
+    :return: A list containing an output distribution for each name
+    """
+
+    predicted_ethnicites = []
+
+    for prediction in predictions:
+        ethnicity_distribution = {}
+        for idx, ethnicity in enumerate(classes):
+            confidence = round(100 * float(np.exp(prediction[idx])), 3)
+            ethnicity_distribution[ethnicity] = confidence
+
+        predicted_ethnicites.append(ethnicity_distribution)
+
+    return predicted_ethnicites
+
     
 
-def predict(input_batch: torch.tensor, model_config: dict) -> str:
-    """ load model and predict preprocessed name
+def predict(input_batch: torch.tensor, model_config: dict, get_distribution: bool=False) -> str:
+    """ 
+    Loads model and predict preprocessed name
 
     :param torch.tensor input_batch: input-batch
     :param str model_path: path to saved model-paramters
@@ -187,13 +242,13 @@ def predict(input_batch: torch.tensor, model_config: dict) -> str:
 
     # prepare model (map model-file content from gpu to cpu if necessary)
     model = Model(
-                class_amount=model_config["amount-classes"], 
-                embedding_size=model_config["embedding-size"],
-                hidden_size=model_config["hidden-size"],
-                layers=model_config["rnn-layers"],
-                kernel_size=model_config["cnn-parameters"][0],
-                channels=model_config["cnn-parameters"][1]
-            ).to(device=device)
+        class_amount=model_config["amount-classes"], 
+        embedding_size=model_config["embedding-size"],
+        hidden_size=model_config["hidden-size"],
+        layers=model_config["rnn-layers"],
+        kernel_size=model_config["cnn-parameters"][0],
+        channels=model_config["cnn-parameters"][1]
+    ).to(device=device)
 
     model_path = model_config["model-file"]
 
@@ -210,22 +265,23 @@ def predict(input_batch: torch.tensor, model_config: dict) -> str:
     for batch in input_batch:
         predictions = model(batch.float())
 
-        # convert numerics to country name
-        predicted_ethnicites = []
-        for idx in range(len(predictions)):
-            prediction = predictions.cpu().detach().numpy()[idx]
-            prediction_idx = list(prediction).index(max(prediction))
-            ethnicity = list(classes.keys())[list(classes.values()).index(prediction_idx)]
-            predicted_ethnicites.append(ethnicity)
+        predictions = model(batch.float()).cpu().detach().numpy()
 
-        total_predicted_ethncitities += predicted_ethnicites
-    
+        if get_distribution:
+            # get entire ethnicity confidence distribution for each name
+            prediction_result = get_ethnicity_distributions(predictions, classes=classes)
+        else:
+            # get only the ethnicity with the highest confidence for each name
+            prediction_result = get_ethnicity_predictions(predictions, classes=classes)
+
+        total_predicted_ethncitities.extend(prediction_result)
+
     return total_predicted_ethncitities
     
 
 if __name__ == "__main__":
     # get names from console arguments
-    names, csv_out_path, model_config_folder, batch_size, device = get_flags()
+    names, get_distribution, csv_out_path, model_config_folder, batch_size, device = get_flags()
 
     # get model configuration
     with open(model_config_folder + "/nationalities.json", "r") as f: classes = json.load(f)
@@ -245,20 +301,25 @@ if __name__ == "__main__":
     }
 
     # predict ethnicities
-    ethnicities = predict(input_batch, model_config)
+    predictions = predict(input_batch, model_config, get_distribution=get_distribution)
+
+    # stores either the entire output distribution in a dataframe or just the most likely ethnicity
+    if get_distribution:
+        result_df = pd.DataFrame(predictions)
+        highest_confidence_ethnicities = result_df.idxmax(axis=1)
+        result_df.insert(loc=0, column="names", value=names)
+        result_df.insert(loc=1, column="predictions", value=highest_confidence_ethnicities)
+    else:
+        ethnicities, confidence = zip(*predictions)
+        result_df = pd.DataFrame(list(zip(names, ethnicities, confidence)), columns=["names", "predictions", "confidences"])
 
     # check if the -i/--input and -o/--output flag was set, by checking if there is a csv-save-file, if so: save names with their ethnicities
     if csv_out_path != None:
-        df = pd.DataFrame()
-        df["names"] = names
-        df["ethnicities"] = ethnicities
-
-        open(csv_out_path, "w+").close()
-        df.to_csv(csv_out_path, index=False)
+        result_df.to_csv(csv_out_path, index=False)
     
         print("\nClassified all names and saved to {}.\n".format(csv_out_path))
     
     # if a single name was parsed using -n/--name, print the predicition
     else:
-        print("\nname: {} - predicted ethnicity: {}".format(names[0], ethnicities[0]))
+        print("\nname: {} - predicted ethnicity: {}".format(result_df["names"][0], result_df["predictions"][0]))
 
