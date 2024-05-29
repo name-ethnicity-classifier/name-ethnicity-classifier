@@ -55,17 +55,25 @@ python predict_ethnicity.py -i ./examples/names.csv -o ./examples/predicted_ethn
 #### Example files:
 The input .csv file has to have one column named "names" (upper-/ lower case doesn't matter):
 ```csv
-1 names
-2 John Doe
-3 Max Mustermann
+| names           |
+|-----------------|
+| John Doe        |
+| Max Mustermann  |
+
 ```
 
 After running the command, the output .csv will look like this:
-```csv
-1 names,predictions
-2 John Doe,american
-3 Max Mustermann,german
-```
+| names           | predictions | confidences |
+|-----------------|-------------|-------------|
+| John Doe        | american    | 0.73        |
+| Max Mustermann  | german      | 0.92        |
+
+
+If the ``--distribution`` flag was set the output .csv will look like this:
+| names           | predictions | american | german |
+|-----------------|-------------|----------|--------|
+| John Doe        | american    | 0.73     | 0.27   |
+| Max Mustermann  | german      | 0.08     | 0.92   |
 
 ---
 
