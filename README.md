@@ -96,6 +96,7 @@ python3 predict_ethnicitiy.py -n "Gonzalo Rodriguez"
 | ```german_austrian_and_else``` | <details><summary>click to see nationalities</summary>``german/austrian combined`` ``else``</details> | 88.1% |
 | ```indian_and_else``` | <details><summary>click to see nationalities</summary>``else`` ``indian``</details> | 94.63% |
 | ```japanese_and_else``` | <details><summary>click to see nationalities</summary>``else`` ``japanese``</details> | 99.33% |
+| ```newzealand_and_else``` | <details><summary>click to see nationalities</summary>``else`` ``new zealander``</details> | 66.71% |
 
 
 
