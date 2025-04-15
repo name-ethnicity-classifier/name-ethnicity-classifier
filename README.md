@@ -14,8 +14,15 @@ git clone https://github.com/name-ethnicity-classifier/name-ethnicity-classifier
 cd name-ethnicity-classifier/
 ```
 ### Dependencies:
-Install the followng packages via ``pip`` or ``conda``:
-``Python>=3.7``, ``PyTorch``, ``NumPy``, ``Pandas``
+The script was tested with **Python ≥ 3.10**.
+
+The following packages are needed: ``NumPy``, ``Pandas`` and ``PyTorch``.
+
+You can install them individually with ``pip`` or ``conda`` or use the provided [`requirements.txt`](requirements.txt):
+
+```bash
+pip install -r requirements.txt
+```
 
 ---
 
