@@ -199,13 +199,24 @@ def predict(input_batch: torch.tensor, model_config: dict, classes: list ,get_di
     return total_predicted_ethncitities
     
 def predict_ethnicity (names: list, batch_size: int=128, model: str="21_nationalities_and_else", get_distribution: bool=False) -> list: 
-    
+    """
+    Predicts the ethnicity of a given list of names. Configured by arguments
+
+    :param names: list of names to by classified
+    :param batch_size: number of names to be classified, defaults to 128
+    :param model: model being used, check README for all models, defaults to "21_nationalities_and_else"
+    :param get_distribution: If true returns a dict of all coutnry predictions and scores, defaults to False
+    :return list: predicted ethincity of each name 
+    """
+
+    #for single names
     if isinstance(names, str):
         names = [names]
 
     # preprocess inputs
     input_batch = preprocess_names(names=names, batch_size=batch_size)
     model_config_folder = get_model_folder(model)
+
     # get model configuration
     with open(model_config_folder + "/nationalities.json", "r") as f: classes = json.load(f)
     with open(model_config_folder + "/config.json", "r") as f: model_parameter_config = json.load(f)
