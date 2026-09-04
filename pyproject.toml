@@ -1,0 +1,21 @@
+[project]
+name = "n2e"
+version = "0.1.0"
+description = "n2e is a python package/cli tool that classifies a persons ethnicity based on their name"
+readme = "README.md"
+authors = [
+    { name = "Theodor peifer", email = "teddypeifer@gmail.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=2.2.6",
+    "pandas>=2.3.3",
+    "torch>=2.13.0",
+]
+
+[project.scripts]
+n2e = "n2e.cli:main"
+
+[build-system]
+requires = ["uv_build"]
+build-backend = "uv_build"

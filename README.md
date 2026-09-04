@@ -8,7 +8,26 @@ Name-ethnicity classification is the process of using a person's name to predict
 
 
 ## :arrow_down: Installation:
+
+
+### Install the package: 
+
+For the n2e CLI interface you can install by running 
+
+```
+uv tool install n2e 
+```
+
+For the n2e python package 
+
+```
+pip install n2e
+or
+uv add n2e 
+```
+
 ### Get repository:
+if you want to clone the repository instead you can clone it by running
 ```
 git clone https://github.com/name-ethnicity-classifier/name-ethnicity-classifier
 cd name-ethnicity-classifier/
@@ -16,27 +35,20 @@ cd name-ethnicity-classifier/
 ### Dependencies:
 The script was tested with **Python ≥ 3.10**.
 
-The following packages are needed: ``NumPy``, ``Pandas`` and ``PyTorch``.
+The following packages are installed and used as dependencies: ``NumPy``, ``Pandas`` and ``PyTorch``.
 
-You can install them individually with ``pip`` or ``conda`` or use the provided [`requirements.txt`](requirements.txt):
-
-```bash
-pip install -r requirements.txt
-```
-
----
 
 ## 👨‍💻 Usage:
 
 ### Read this first:
 
-Before you start classifying, check out the different model configurations inside the folder [model_configurations/](./model_configurations/) or in the table below.
+Before you start classifying, check out the different model configurations in the table below. Models are hosted as GitHub release assets and downloaded automatically the first time you use one, then cached in ~/.cache/n2e/
 
 There you will find different models which each classify a unique set of nationalities.
 
 The README.md in each model folder will inform you about which ethnicities it can classify, its performance and more information you should know about it.
 
-When using this console interface, you can specify which model you want to use.
+When using this console interface or the python api, you can specify which model you want to use.
 
 ##### None of the models is suitable for your problem?
 On our website, www.name-to-ethnicity.com, you can request custom models trained on selected ethnicities (for free!).
@@ -46,8 +58,8 @@ On our website, www.name-to-ethnicity.com, you can request custom models trained
 | :------------- |:------------- | ----- |
 | ```-i, --input``` | Sets the path to an input .csv file containing first and last names; must contain one column called "names". | ``-i "./examples/name.csv"`` (required unless ``-n`` is used) | 
 | ```-o, --output``` | Path to an output .csv in which the names along with the predictions will be stored (file will be created if it doesn't exist). | ``-o "./examples/predictions.csv"`` (optional, default: ``{input file name}_output.csv``) |
-| ```-m, --model``` | Name of model configuration which can be chosen from "model_configurations/" or from the table below. | ``-m indian_and_else`` (optional, default: ``21_nationalities_and_else``) |
-| ```-d, --device``` | Device on which the model will run, must be either "gpu" or "cpu". | ``-m "gpu"`` (optional, default: ``gpu``) |
+| ```-m, --model``` | Name of model configuration which can be chosen from from the table below. | ``-m indian_and_else`` (optional, default: ``21_nationalities_and_else``) |
+| ```-d, --device``` | Device on which the model will run, must be either "gpu" or "cpu". | ``-d "gpu"`` (optional, default: ``gpu``) |
 | ```-b, --batchsize``` | Specifies how many names will be processed in parallel (if it crashes choose a batch-size smaller than the amount of names in your .csv file). | ``-b 128`` (optional, default: amount of names in input-file) |
 | ```--distribution``` | If set, the output with contain the entire output distribution, ie. providing the confidence for all possible ethnicities. | No parameter |
 | ```-n, --name``` | Alternative to ``-i``, expects just a single name which is then predicted | ``-n "cixin liu"`` (required unless ``-i`` is used) | 
@@ -57,7 +69,7 @@ On our website, www.name-to-ethnicity.com, you can request custom models trained
 ### Option 1: Classifying names in a given .csv file :
 #### Example command:
 ```
-python predict_ethnicity.py -i ./examples/names.csv -o ./examples/predicted_ethnicities.csv -m 21_nationalities_and_else -d gpu -b 64
+n2e -i ./examples/names.csv -o ./examples/predicted_ethnicities.csv -m 21_nationalities_and_else -d gpu -b 64
 ```
 #### Example files:
 The input .csv file has to have one column named "names" (upper-/ lower case doesn't matter):
@@ -84,12 +96,44 @@ If the ``--distribution`` flag was set the output .csv will look like this:
 
 #### Example command:
 ```
-python3 predict_ethnicity.py -n "Gonzalo Rodriguez"
+n2e -n "Gonzalo Rodriguez"
 
 >> name: Gonzalo Rodriguez - predicted ethnicity: spanish
 ```
-
 ---
+
+### Option 3: Python API 
+
+Import predict_ethnicity to use n2e directly in Python
+#### Example command:
+
+```python
+from n2e import predict_ethnicity
+
+predict_ethnicity(
+    names,                              # str, or list[str]
+    batch_size=128,                     # names processed in parallel
+    model="21_nationalities_and_else",  # any model from the table below
+    get_distribution=False,             # return confidences for every ethnicity
+)
+```
+
+Returns a list of `(ethnicity, confidence)` tuples, one per name:
+
+```python
+>>> predict_ethnicity("Giorgos Papadopoulos")
+[('greek', 99.045)]
+
+>>> predict_ethnicity(["Giorgos Papadopoulos", "Max Mustermann"])
+[('greek', 99.045), ('german', 60.34)]
+```
+
+With `get_distribution=True` you get a dict per name instead:
+
+```python
+>>> predict_ethnicity("Giorgos Papadopoulos", get_distribution=True)
+[{'british': 0.073, 'else': 0.046, 'indian': 0.008, ...}]
+```
 
 ## :earth_africa: Models:
 

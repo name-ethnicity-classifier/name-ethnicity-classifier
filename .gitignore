@@ -1,5 +1,5 @@
 .vscode/
-__pychache__*
+__pycache__*
 
 src/clustering/dataset/*
 !src/clustering/dataset/.gitkeep
