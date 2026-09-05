@@ -127,12 +127,12 @@ def get_ethnicity_predictions(predictions: np.array, classes: list) -> list[str]
 
 def get_ethnicity_distributions(predictions: np.array, classes: list) -> list[dict]:
     """
-    Collfects the entire output distribution for every predictions in a batch
-    For example if the model classified a batch o two names into eithher "german" or "greek":
+    Collects the entire output distribution for every predictions in a batch
+    For example if the model classified a batch of two names into either "german" or "greek":
     > [{german: 0.9, greek: 0.1}, {german: 0.2, greek: 0.8}]
 
     :param predictions: The output predictions of the model
-    :param classes: A list co ntaining all the classes which a model can classify
+    :param classes: A list containing all the classes which a model can classify
     :return: A list containing an output distribution for each name
     """
 
@@ -198,20 +198,20 @@ def predict(input_batch: torch.tensor, model_config: dict, classes: list ,get_di
 
     return total_predicted_ethncitities
     
-def predict_ethnicity (names: list, batch_size: int=128, model: str="21_nationalities_and_else", get_distribution: bool=False) -> list: 
+def predict_ethnicities (names: list[str], batch_size: int=128, model: str="21_nationalities_and_else", get_distribution: bool=False) -> list: 
     """
     Predicts the ethnicity of a given list of names. Configured by arguments
 
-    :param names: list of names to by classified
-    :param batch_size: number of names to be classified, defaults to 128
+    :param names: list of names to be classified
+    :param batch_size: number of names to be classified at a time in batches, defaults to 128
     :param model: model being used, check README for all models, defaults to "21_nationalities_and_else"
     :param get_distribution: If true returns a dict of all coutnry predictions and scores, defaults to False
     :return list: predicted ethincity of each name 
     """
 
-    #for single names
+    #for single names as str
     if isinstance(names, str):
-        names = [names]
+        raise TypeError("field: names, must be a list of strings.")
 
     # preprocess inputs
     input_batch = preprocess_names(names=names, batch_size=batch_size)

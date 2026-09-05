@@ -85,7 +85,7 @@ def main():
     # get names from console arguments
     names, get_distribution, csv_out_path, model, batch_size, device = get_flags()
 
-    predictions = predict_ethnicity(names, batch_size, model, get_distribution)
+    predictions = predict_ethnicities(names, batch_size, model, get_distribution)
     
     # stores either the entire output distribution in a dataframe or just the most likely ethnicity
     if get_distribution:

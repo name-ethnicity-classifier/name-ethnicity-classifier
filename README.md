@@ -110,8 +110,8 @@ Import predict_ethnicity to use n2e directly in Python
 ```python
 from n2e import predict_ethnicity
 
-predict_ethnicity(
-    names,                              # str, or list[str]
+predict_ethnicities(
+    names,                              # list[str]
     batch_size=128,                     # names processed in parallel
     model="21_nationalities_and_else",  # any model from the table below
     get_distribution=False,             # return confidences for every ethnicity
@@ -121,17 +121,17 @@ predict_ethnicity(
 Returns a list of `(ethnicity, confidence)` tuples, one per name:
 
 ```python
->>> predict_ethnicity("Giorgos Papadopoulos")
+>>> predict_ethnicities("Giorgos Papadopoulos")
 [('greek', 99.045)]
 
->>> predict_ethnicity(["Giorgos Papadopoulos", "Max Mustermann"])
+>>> predict_ethnicities(["Giorgos Papadopoulos", "Max Mustermann"])
 [('greek', 99.045), ('german', 60.34)]
 ```
 
 With `get_distribution=True` you get a dict per name instead:
 
 ```python
->>> predict_ethnicity("Giorgos Papadopoulos", get_distribution=True)
+>>> predict_ethnicities("Giorgos Papadopoulos", get_distribution=True)
 [{'british': 0.073, 'else': 0.046, 'indian': 0.008, ...}]
 ```
 
