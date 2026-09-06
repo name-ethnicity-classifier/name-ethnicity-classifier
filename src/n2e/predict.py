@@ -218,7 +218,7 @@ def predict_ethnicities (names: list[str], batch_size: int=128, model: str="21_n
     model_config_folder = get_model_folder(model)
 
     # get model configuration
-    with open(model_config_folder + "/nationalities.json", "r") as f: classes = json.load(f)
+    with open(model_config_folder + "/classes.json", "r") as f: classes = json.load(f)
     with open(model_config_folder + "/config.json", "r") as f: model_parameter_config = json.load(f)
     model_file = model_config_folder + "/model.pt"
     

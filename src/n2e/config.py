@@ -35,6 +35,7 @@ def get_model_folder(model_name: str) -> str:
     :param model_name: the name of the model to be checked
     :return: the path_name of the destination directory, defaults to ~/.cache/n2e/{model_name}
     """
+    
     dest = os.path.join(CACHE_PATH, model_name)
     if not os.path.isdir(dest):
         download_zip(model_name)

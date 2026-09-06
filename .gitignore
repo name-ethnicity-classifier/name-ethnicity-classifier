@@ -17,3 +17,8 @@ src/old-experiments/
 src/old_README.md
 
 wandb*
+
+dist/
+*.egg-info/
+
+release_assets/
