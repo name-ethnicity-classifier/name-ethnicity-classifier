@@ -11,7 +11,7 @@ jobs:
       url: https://pypi.org/p/n2e
 
     permissions:
-      contents: read
+      contents: write
       id-token: write
 
     steps:
@@ -21,12 +21,41 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
 
+      - name: Get version
+        id: version
+        run: |
+          version="$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml","rb"))["project"]["version"])')"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "releasing n2e $version"
+
+      - name: Extract changelog entry
+        id: changelog
+        run: |
+          version="${{ steps.version.outputs.version }}"
+          content=$(awk -v ver="$version" '
+            index($0, "## [" ver "]") == 1 { found = 1; print; next }
+            found && /^---$/ { exit }
+            found { print }
+          ' CHANGELOG.md)
+
+          if [ -z "$content" ]; then
+            echo "::error::No CHANGELOG.md entry for $version - expected a '## [$version]' heading."
+            exit 1
+          fi
+
+          delimiter="EOF_$(openssl rand -hex 8)"
+          {
+            echo "changelog<<$delimiter"
+            echo "$content"
+            echo "$delimiter"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Build
         run: uv build
 
-      - name: Check version
+      - name: Check version is not already published
         run: |
-          version="$(basename dist/*.whl | cut -d- -f2)"
+          version="${{ steps.version.outputs.version }}"
           if curl -sfL -o /dev/null "https://pypi.org/pypi/n2e/${version}/json"; then
             echo "::error::n2e ${version} is already on PyPI. Bump 'version' in pyproject.toml before publishing."
             exit 1
@@ -35,3 +64,25 @@ jobs:
 
       - name: Publish to PyPI
         run: uv publish --trusted-publishing always
+
+      - name: Build release notes
+        env:
+          CHANGELOG: ${{ steps.changelog.outputs.changelog }}
+        run: |
+          version="${{ steps.version.outputs.version }}"
+          {
+            printf '%s\n\n' "$CHANGELOG"
+            printf -- '---\n\n'
+            printf '📦 Available on PyPI: [`n2e %s`](https://pypi.org/project/n2e/%s/)\n\n' "$version" "$version"
+            printf 'Install with `uv tool install n2e`, `uv add n2e` or `pip install n2e`.\n'
+          } > release_notes.md
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: "🎉 N2E Release ${{ steps.version.outputs.version }}"
+          body_path: release_notes.md
+          target_commitish: ${{ github.sha }}
+          draft: false
+          prerelease: false

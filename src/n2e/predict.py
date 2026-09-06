@@ -4,7 +4,6 @@ import os
 import re
 import string
 import unicodedata
-from typing import Union
 
 import numpy as np
 import pandas as pd
@@ -209,9 +208,8 @@ def predict_ethnicities (names: list[str], batch_size: int=128, model: str="21_n
     :return list: predicted ethincity of each name 
     """
 
-    #for single names as str
     if isinstance(names, str):
-        raise TypeError("field: names, must be a list of strings.")
+        raise TypeError(f"Names must be provided as a list of strings - did you mean ['{names}']?")
 
     # preprocess inputs
     input_batch = preprocess_names(names=names, batch_size=batch_size)
