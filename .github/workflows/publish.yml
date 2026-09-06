@@ -1,0 +1,37 @@
+name: Publish n2e to PyPI
+
+on: workflow_dispatch
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: pypi
+      url: https://pypi.org/p/n2e
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+
+      - name: Build
+        run: uv build
+
+      - name: Check version
+        run: |
+          version="$(basename dist/*.whl | cut -d- -f2)"
+          if curl -sfL -o /dev/null "https://pypi.org/pypi/n2e/${version}/json"; then
+            echo "::error::n2e ${version} is already on PyPI. Bump 'version' in pyproject.toml before publishing."
+            exit 1
+          fi
+          echo "n2e ${version} is not on PyPI yet - proceeding."
+
+      - name: Publish to PyPI
+        run: uv publish --trusted-publishing always
