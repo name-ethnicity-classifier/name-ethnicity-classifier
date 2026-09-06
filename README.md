@@ -58,26 +58,23 @@ On the website [www.name-to-ethnicity.com](https://www.name-to-ethnicity.com) yo
 The following flags are available:
 | flag | description | example |
 | :------------- |:------------- | ----- |
-| ```-i, --input``` | Sets the path to an input .csv file containing first and last names; must contain one column called "names". | ``-i "./examples/names.csv"`` (required unless ``-n`` is used) | 
+| ```-i, --input``` | Sets the path to an input .csv file containing first and last names; must contain one column called "names". | ``-i "./examples/names.csv"`` (required) | 
 | ```-o, --output``` | Path to an output .csv in which the names along with the predictions will be stored (file will be created if it doesn't exist). | ``-o "./examples/predictions.csv"`` (optional, default: ``{input file name}_output.csv``) |
 | ```-m, --model``` | Name of model configuration which can be chosen from the table below. | ``-m indian_and_else`` (optional, default: ``21_nationalities_and_else``) |
 | ```-d, --device``` | Device on which the model will run, must be either "gpu" or "cpu". | ``-d "gpu"`` (optional, default: ``gpu``) |
 | ```-b, --batchsize``` | Specifies how many names will be processed in parallel (if it crashes choose a batch-size smaller than the amount of names in your .csv file). | ``-b 128`` (optional, default: amount of names in input-file) |
 | ```--distribution``` | If set, the output will contain the entire output distribution, ie. providing the confidence for all possible ethnicities. | No parameter |
-| ```-n, --name``` | Alternative to ``-i``, expects just a single name which is then predicted | ``-n "cixin liu"`` (required unless ``-i`` is used) | 
 
-#### Option 1 - Bulk classification:
-
-To classify a list of names in a given `.csv` file, see the following example command:
-```bash
-n2e -i ./examples/names.csv -o ./examples/predicted_ethnicities.csv -m 21_nationalities_and_else -d gpu -b 64
-```
-
-The input .csv file has to have one column named "names" (upper-/ lower case doesn't matter):
+To classify a list of names put them into a `.csv` file, with one column named "names". For example:
 | names                |
 |----------------------|
 | Giorgos Papadopoulos |
 | Max Mustermann       |
+
+Then run the classification, for example like this:
+```bash
+n2e -i ./examples/names.csv -o ./examples/predicted_ethnicities.csv -m 21_nationalities_and_else -d gpu -b 64
+```
 
 After running the command, the output `.csv` will look like this:
 | names                | predictions | confidences |
@@ -91,16 +88,6 @@ If the ``--distribution`` flag was set the output `.csv` will look like this:
 | Giorgos Papadopoulos | greek       | 0.73     | 0.27   |
 | Max Mustermann       | german      | 0.08     | 0.92   |
 
----
-
-#### Option 2 - Classifying a single name:
-
-To quickly classify just a single name, run:
-```bash
-n2e -n "Max Mustermann"
-
->> name: Max Mustermann - predicted ethnicity: german
-```
 ---
 
 ### Python API:

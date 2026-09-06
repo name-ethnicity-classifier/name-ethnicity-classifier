@@ -1,13 +1,12 @@
 
 from n2e.predict import *
 
-def get_flags() -> Union[list, bool, str, str, int, str]:
+def get_flags() -> tuple:
     """
     Handles console arguments
 
     :return list: list of names to predict ethnicities
     :return bool: wether the user wants the entire output distribution
-    :return list: list of names to predict ethnicities
     :return str: path of csv-file in which to save ethnicities
     :return str: model configuration name
     :return int: batch-size for forward pass
@@ -16,39 +15,26 @@ def get_flags() -> Union[list, bool, str, str, int, str]:
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-i", "--input", required=False, help="Path to .csv containing (first and last) names; must contain one column called 'names' (name freely selectable)")
-    parser.add_argument("-o", "--output", required=False, help="Path to .csv in which the names along with the predictions will be stores (file will be created if it doesn't exist; name freely selectable)")
+    parser.add_argument("-i", "--input", required=True, help="Path to .csv containing names; must contain one column called 'names'")
+    parser.add_argument("-o", "--output", required=False, help="Path to .csv in which the names along with the predictions will be stored (file will be created if it doesn't exist)")
     parser.add_argument("-d", "--device", required=False, help="Must be either 'gpu' or 'cpu' (standard: 'gpu' if cuda support is detected, else 'cpu')")
     parser.add_argument("-b", "--batchsize", required=False, help="Specifies how many names will be processed in parallel (standard: process all names in parallel; if it crashes choose a batch-size smaller than the amount of names in your .csv file; the bigger the batchsize the faster it will classify the names)")
-    parser.add_argument("-n", "--name", required=False, help="First and last name (upper-/ lower case doesn't matter)")
-    parser.add_argument("-m", "--model", required=False, help="Folder name of model configuration which can be chosen from 'model_configurations/' (standard: '21_nationalities_and_else')")
+    parser.add_argument("-m", "--model", required=False, help="Name of the model configuration which can be chosen from the table in the README (standard: '21_nationalities_and_else')")
     parser.add_argument("--distribution", required=False, action="store_true", help="If set, the entire output distribution is returned")
 
     args = vars(parser.parse_args())
 
-    # check if -/--name is used and -i/--input not
-    if args["name"] != None and args["input"] == None:
-        names = [args["name"]]
-        csv_out_path = None
-        get_distribution = False
-    
-    # check if -/--name is not used but -i/--input is
-    elif args["name"] == None and args["input"] != None:
-        csv_in_path = args["input"]
-        csv_out_path = args["output"]
-        names = pd.read_csv(csv_in_path)["names"].tolist()
+    input_df = pd.read_csv(args["input"])
+    if "names" not in input_df.columns:
+        raise ValueError("The input .csv must contain a column called 'names'.")
 
-    # check if -/--name and -c/--csv are both not used (raise error)
-    elif args["name"] == None and args["input"] == None:
-        raise ValueError("Either -n/--name or -i/--input must be set!")
-
-    # check if -/--name and -c/--csv are both used (raise error)
-    elif args["name"] != None and args["input"] != None:
-        raise ValueError("-n/--name and -i/--input can't both be set!")
+    names = input_df["names"].tolist()
 
     # create an output file name if none was specified
-    if args["input"] != None and args["output"] == None:
+    if args["output"] == None:
         csv_out_path = f"{args['input'].removesuffix('.csv')}_output.csv"
+    else:
+        csv_out_path = args["output"]
 
     # check wether the user wants the entire output distribution
     get_distribution = args["distribution"]
@@ -80,13 +66,12 @@ def get_flags() -> Union[list, bool, str, str, int, str]:
     return names, get_distribution, csv_out_path, model, batch_size, device
 
 
-
 def main():
     # get names from console arguments
     names, get_distribution, csv_out_path, model, batch_size, device = get_flags()
 
     predictions = predict_ethnicities(names, batch_size, model, get_distribution)
-    
+
     # stores either the entire output distribution in a dataframe or just the most likely ethnicity
     if get_distribution:
         result_df = pd.DataFrame(predictions)
@@ -97,15 +82,9 @@ def main():
         ethnicities, confidence = zip(*predictions)
         result_df = pd.DataFrame(list(zip(names, ethnicities, confidence)), columns=["names", "predictions", "confidences"])
 
-    # check if the -i/--input and -o/--output flag was set, by checking if there is a csv-save-file, if so: save names with their ethnicities
-    if csv_out_path != None:
-        result_df.to_csv(csv_out_path, index=False)
+    result_df.to_csv(csv_out_path, index=False)
 
-        print("\nClassified all names and saved to {}.\n".format(csv_out_path))
-
-    # if a single name was parsed using -n/--name, print the predicition
-    else:
-        print("\nname: {} - predicted ethnicity: {}".format(result_df["names"][0], result_df["predictions"][0]))
+    print("\nClassified all names and saved to {}.\n".format(csv_out_path))
 
 if __name__ == "__main__":
     main()
